@@ -1,0 +1,11 @@
+{
+  "name": "dogboris",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Локальный micro-MVP для записи на прогулку с Борисом",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node --check server.js"
+  }
+}

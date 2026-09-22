@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Кто выгуливает Бориса</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #27233a;
+      --muted: #746f85;
+      --paper: #fffdf9;
+      --lavender: #eee9ff;
+      --lavender-deep: #d9d0ff;
+      --orange: #e97842;
+      --orange-dark: #b94d22;
+      --green: #3c805c;
+      --green-soft: #e6f4e9;
+      --line: #ded8ee;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, #fff7dc 0 18%, transparent 42%),
+        linear-gradient(135deg, #f4efff, #fff8ef 58%, #eaf5ef);
+    }
+
+    main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 34px 0 56px; }
+
+    .topline { display: flex; justify-content: space-between; gap: 24px; align-items: end; margin-bottom: 48px; }
+    .eyebrow { margin: 0 0 10px; color: var(--orange-dark); font: 700 0.78rem/1.2 Arial, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; }
+    h1 { max-width: 650px; margin: 0; font-size: clamp(2.5rem, 7vw, 5.8rem); line-height: 0.9; letter-spacing: 0; }
+    .date { margin: 0; color: var(--muted); font: 700 1rem/1.4 Arial, sans-serif; text-align: right; }
+
+    .intro { display: grid; grid-template-columns: 1fr 0.32fr; gap: 28px; align-items: end; margin-bottom: 18px; }
+    h2 { margin: 0; font-size: 2rem; }
+    .hint { margin: 0; color: var(--muted); font: 0.95rem/1.5 Arial, sans-serif; }
+    .slots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+    .slot { min-height: 270px; padding: 19px; border: 1px solid var(--line); border-radius: 8px; background: rgb(255 253 249 / 86%); box-shadow: 0 12px 26px rgb(73 47 115 / 8%); display: flex; flex-direction: column; }
+    .slot.busy { border-color: #abd1b6; background: var(--green-soft); }
+    .slot-time { margin: 0 0 28px; font: 700 2.2rem/1 Arial, sans-serif; }
+    .status { margin: 0 0 22px; color: var(--muted); font: 700 0.76rem/1.2 Arial, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+    .busy .status { color: var(--green); }
+    .name { margin: auto 0 18px; font-size: 1.2rem; line-height: 1.2; overflow-wrap: anywhere; }
+    form { margin-top: auto; }
+    label { display: block; margin-bottom: 7px; color: var(--muted); font: 0.75rem/1.2 Arial, sans-serif; }
+    input { width: 100%; padding: 10px 9px; border: 1px solid var(--line); border-radius: 4px; color: var(--ink); background: white; font: 0.95rem Georgia, serif; }
+    input:focus { outline: 3px solid rgb(233 120 66 / 25%); border-color: var(--orange); }
+    button { width: 100%; margin-top: 9px; padding: 11px 10px; border: 0; border-radius: 4px; color: white; background: var(--orange); font: 700 0.86rem Arial, sans-serif; cursor: pointer; }
+    button:hover { background: var(--orange-dark); }
+    button:disabled { cursor: wait; opacity: 0.65; }
+    .message { min-height: 24px; margin: 18px 0 0; font: 0.9rem/1.4 Arial, sans-serif; }
+    .message.error { color: #a43636; }
+    .message.success { color: var(--green); }
+    .feeding { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: end; margin: 46px 0 0; padding: 20px 22px; border: 1px solid var(--line); border-radius: 8px; background: rgb(255 253 249 / 82%); }
+    .feeding h2 { font-size: 1.45rem; }
+    .feeding-status { margin: 8px 0 0; color: var(--muted); font: 0.9rem/1.45 Arial, sans-serif; }
+    .feeding form { display: flex; gap: 9px; align-items: end; }
+    .feeding form > div { flex: 1; }
+    .feeding button { width: auto; white-space: nowrap; }
+
+    @media (max-width: 800px) {
+      main { padding-top: 24px; }
+      .topline, .intro { grid-template-columns: 1fr; display: grid; margin-bottom: 30px; }
+      .date { text-align: left; }
+      .slots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .slot:last-child { grid-column: 1 / -1; }
+      .feeding { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      main { width: min(100% - 22px, 420px); }
+      h1 { font-size: 3.5rem; }
+      .slots { grid-template-columns: 1fr; }
+      .slot:last-child { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="topline">
+      <div>
+        <p class="eyebrow">Догяндекс · общий двор</p>
+        <h1>Кто выгуливает Бориса?</h1>
+      </div>
+      <p class="date" id="date">Загрузка даты...</p>
+    </header>
+
+    <section aria-labelledby="walk-heading">
+      <div class="intro">
+        <h2 id="walk-heading">Прогулки на сегодня</h2>
+        <p class="hint">Выберите свободное время и оставьте ФИО сотрудника.</p>
+      </div>
+      <div class="slots" id="slots" aria-live="polite"></div>
+      <p class="message" id="message" role="status"></p>
+    </section>
+
+    <section class="feeding" aria-labelledby="feeding-heading">
+      <div>
+        <h2 id="feeding-heading">Последнее кормление</h2>
+        <p class="feeding-status" id="feeding-status">Загрузка...</p>
+      </div>
+      <form id="feeding-form">
+        <div>
+          <label for="feeding-name">ФИО сотрудника</label>
+          <input id="feeding-name" name="employeeName" required maxlength="120" autocomplete="name">
+        </div>
+        <button type="submit">Отметить</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const slotsElement = document.querySelector('#slots');
+    const dateElement = document.querySelector('#date');
+    const messageElement = document.querySelector('#message');
+    const feedingStatusElement = document.querySelector('#feeding-status');
+    const feedingForm = document.querySelector('#feeding-form');
+
+    function showMessage(text, type = '') {
+      messageElement.textContent = text;
+      messageElement.className = `message ${type}`;
+    }
+
+    function renderSlots(slots) {
+      slotsElement.innerHTML = slots.map((slot) => {
+        if (slot.booked_by) {
+          return `
+            <article class="slot busy" aria-label="Занятый слот ${slot.slot_time}">
+              <p class="slot-time">${slot.slot_time}</p>
+              <p class="status">Занято</p>
+              <p class="name">${escapeHtml(slot.booked_by)}</p>
+            </article>`;
+        }
+
+        return `
+          <article class="slot" aria-label="Свободный слот ${slot.slot_time}">
+            <p class="slot-time">${slot.slot_time}</p>
+            <p class="status">Свободно</p>
+            <form data-slot-time="${slot.slot_time}">
+              <label for="name-${slot.id}">ФИО сотрудника</label>
+              <input id="name-${slot.id}" name="employeeName" required maxlength="120" autocomplete="name">
+              <button type="submit">Записаться</button>
+            </form>
+          </article>`;
+      }).join('');
+
+      slotsElement.querySelectorAll('form').forEach((form) => {
+        form.addEventListener('submit', submitReservation);
+      });
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>'"]/g, (character) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[character]));
+    }
+
+    async function loadSlots() {
+      const response = await fetch('/api/timeslots');
+      const data = await response.json();
+      dateElement.textContent = new Intl.DateTimeFormat('ru-RU', {
+        dateStyle: 'full'
+      }).format(new Date(`${data.date}T12:00:00`));
+      renderSlots(data.slots);
+    }
+
+    function formatFeedingTime(value) {
+      return new Intl.DateTimeFormat('ru-RU', {
+        dateStyle: 'short',
+        timeStyle: 'short'
+      }).format(new Date(value));
+    }
+
+    async function loadLatestFeeding() {
+      const response = await fetch('/api/latest-feeding');
+      const data = await response.json();
+      feedingStatusElement.textContent = data.feeding
+        ? `${data.feeding.employee_name} · ${formatFeedingTime(data.feeding.fed_at)}`
+        : 'Пока никто не отмечал кормление.';
+    }
+
+    feedingForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const button = feedingForm.querySelector('button');
+      const employeeName = new FormData(feedingForm).get('employeeName').trim();
+      button.disabled = true;
+
+      try {
+        const response = await fetch('/api/feeding', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ employeeName })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          feedingStatusElement.textContent = data.error;
+          return;
+        }
+        feedingForm.reset();
+        await loadLatestFeeding();
+      } catch (error) {
+        feedingStatusElement.textContent = 'Сервер недоступен. Попробуйте ещё раз.';
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    async function submitReservation(event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const button = form.querySelector('button');
+      const employeeName = new FormData(form).get('employeeName').trim();
+      button.disabled = true;
+      showMessage('Сохраняем запись...');
+
+      try {
+        const slotsResponse = await fetch('/api/timeslots');
+        const slotsData = await slotsResponse.json();
+        const response = await fetch('/api/reservation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            walkDate: slotsData.date,
+            slotTime: form.dataset.slotTime,
+            employeeName
+          })
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          showMessage(data.error || 'Не удалось записаться.', 'error');
+          await loadSlots();
+          return;
+        }
+
+        showMessage(`Запись подтверждена: ${data.slot.booked_by}.`, 'success');
+        await loadSlots();
+      } catch (error) {
+        showMessage('Сервер недоступен. Попробуйте ещё раз.', 'error');
+      }
+    }
+
+    Promise.all([loadSlots(), loadLatestFeeding()])
+      .catch(() => showMessage('Не удалось загрузить данные.', 'error'));
+  </script>
+</body>
+</html>
