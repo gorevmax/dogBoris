@@ -2,4 +2,3 @@ node_modules/
 boris.db
 *.db-shm
 *.db-wal
-secret.config
